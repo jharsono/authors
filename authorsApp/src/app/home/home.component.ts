@@ -10,6 +10,7 @@ export class HomeComponent implements OnInit {
   authors: any;
   constructor(private _httpService: HttpService){ }
   ngOnInit(){
+    this.authors = {}; //set the authors to an empty object
     this.getAuthorsFromService();
     }
   getAuthorsFromService(){ // define the function to get an observable and subscribe
