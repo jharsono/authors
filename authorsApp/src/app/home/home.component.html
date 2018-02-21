@@ -1,0 +1,12 @@
+<div style="text-align:center">
+
+
+    <div id="authors">
+      <div *ngFor="let author of authors.authors" class="authors">
+              Name: {{author.name}}
+        <button (click)="getAuthor(author._id)" [routerLink]="['/edit']">Edit</button> <button (click)="delete(author._id)">Delete</button>
+
+      </div>
+</div>
+
+<router-outlet></router-outlet>
