@@ -8,6 +8,8 @@ import { HttpService } from './http.service';
 import { HttpClientModule } from '@angular/common/http';
 import { EditComponent } from './edit/edit.component';
 import { HomeComponent } from './home/home.component';
+import { ShowQuotesComponent } from './show-quotes/show-quotes.component';
+import { AddQuoteComponent } from './add-quote/add-quote.component';
 
 
 @NgModule({
@@ -15,7 +17,9 @@ import { HomeComponent } from './home/home.component';
     AppComponent,
     AddComponent,
     EditComponent,
-    HomeComponent
+    HomeComponent,
+    ShowQuotesComponent,
+    AddQuoteComponent
   ],
   imports: [
     BrowserModule,

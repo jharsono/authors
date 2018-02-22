@@ -12,6 +12,7 @@ export class EditComponent implements OnInit {
   constructor(private _httpService: HttpService, private router: Router) { }
 
   ngOnInit() {
+    this.author =  {}; //initialize author object
     this.showAuthor();
   }
   showAuthor() {

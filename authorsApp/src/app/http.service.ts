@@ -20,20 +20,34 @@ export class HttpService {
      return this._http.post('/new', author);
    }
 
-   getAuthor(id){
-     console.log("author id:", id);
-     console.log("now in the service");
-     this.authorId = id;
+   getOneAuthor(id) {
+        return this._http.get('/authors/' + id);
+    }
 
-     console.log("author:", this.authorId)
-
+   addQuote(id, quote) {
+       let url = '/authors/' + id + '/quotes';
+       return this._http.post(url, quote);
    }
 
    returnAuthor(){
      return this._http.get(`/authors/${this.authorId}`);
    }
+
+   upvoteQuote(id, quote) {
+       let url = '/authors/' + id + '/quotes/up';
+       return this._http.put(url, quote);
+   }
+
+   downvoteQuote(id, quote) {
+       let url = '/authors/' + id + '/quotes/down';
+       return this._http.put(url, quote);
+   }
    update(author){
      console.log("about to edit: ", this.authorId)
      return this._http.put(`/update/${this.authorId}`, author);
    }
+    deleteQuote(id, index) {
+        let url = '/authors/' + id + '/quotes/' + index;
+        return this._http.delete(url);
+    }
 }

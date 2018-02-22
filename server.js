@@ -16,7 +16,15 @@ app.use(express.static( __dirname + '/authorsApp/dist' ));
 mongoose.connect('mongodb://localhost/authors')
 
 var authorSchema = new mongoose.Schema({
-  name: String,
+  name: {
+         type: String,
+         required: true,
+         minlength: 6
+       },
+  quotes: [{
+         text: String,
+         votes: Number,
+       }]
 }, {timestamps: true});
 
 mongoose.model('author', authorSchema);
@@ -59,7 +67,7 @@ app.delete('/delete/:id', function(req, res) {
   console.log("server deleting: ", req.params.id)
    Author.findByIdAndRemove(req.params.id, function(err, results) {
      if(err) {
-       console.log(err);
+       res.json({error: err})
      } else {
        console.log('successfully deleted');
        res.json({success:results})
@@ -67,29 +75,43 @@ app.delete('/delete/:id', function(req, res) {
    })
 })
 // show one author
-app.get('/authors/:id', function(req, res) {
-  console.log("in the server")
-  Author.findById(req.params.id, function(err, data) {
-    if(err) {
-      console.log("ERROR!", err);
-    } else {
-      console.log('retrieved one author from the DB!!');
-      res.json(data)
-    }
-  })
-})
-//
+app.get('/authors/:id', function(req, res){
+  console.log("id:", req.params.id)
+    Author.findById(req.params.id, function(err, data){
+        if (err) {
+            console.log(err);
+            res.json({error: err});
+        } else {
+            res.json(data);
+        }
+    });
+});
+
+//ADD QUOTE to this author - votes start at 0
+app.post('/authors/:id/quotes', function(req, res) {
+    var quote = {text: req.body.text, votes: 0}
+    Author.update({_id: req.params.id}, { $push: { quotes: quote}}, function(err, results) {
+        if (err) {
+            console.log(err);
+            res.json({error: err});
+        } else {
+            res.json({success: results});
+        }
+    });
+});
+
 //update author
 app.put('/update/:id', function(req, res) {
     Author.findById(req.params.id, function(err, author) {
       if (err) {
+        res.json({error: err})
         console.log("error updating author", err);
       } else {
         author.name = req.body.name;
         author.save(function(err, author) {
           if(err) {
             console.log('something went wrong');
-            res.send(err);
+            res.json({error: err})
           }  else {
           console.log('updated author', author)
           res.json({success: author})
@@ -98,6 +120,73 @@ app.put('/update/:id', function(req, res) {
     }
   })
 })
+//upvote quote
+app.put('/authors/:id/quotes/up', function(req, res) {
+    Author.findById(req.params.id, function(err, _author) {
+        if (err) {
+            console.log(err);
+            res.json({error: err});
+        } else {
+            let _updatedQuotes = _author.quotes;
+            _updatedQuotes[req.body.index].votes += 1;
+            //res.json({success: results});
+            _author.update({quotes: _updatedQuotes}, function(err, results) {
+                if (err) {
+                    console.log(err);
+                    res.json({error: err});
+                } else {
+                    res.json({success: results});
+                }
+            });
+        }
+    });
+});
+
+//downvote quote
+
+app.put('/authors/:id/quotes/down', function(req, res) {
+    Author.findById(req.params.id, function(err, _author) { //get author
+        if (err) {
+            console.log(err);
+            res.json({error: err});
+        } else {
+            let _updatedQuotes = _author.quotes;
+            _updatedQuotes[req.body.index].votes -= 1; //get the index of the quote, score down
+            //res.json({success: results});
+            _author.update({quotes: _updatedQuotes}, function(err, results) {
+                if (err) {
+                    console.log(err);
+                    res.json({error: err});
+                } else {
+                    res.json({success: results});
+                }
+            });
+        }
+    });
+});
+
+//delete quote
+app.delete('/authors/:id/quotes/:index', function(req, res) {
+    Author.findById(req.params.id, function(err, _author) {
+        if (err) {
+            console.log(err);
+            res.json({error: err});
+        } else {
+            let _updatedQuotes = _author.quotes;
+            _updatedQuotes.splice(req.params.index, 1);
+            //res.json({success: results});
+            _author.update({quotes: _updatedQuotes}, function(err, results) {
+                if (err) {
+                    console.log(err);
+                    res.json({error: err});
+                } else {
+                    res.json({success: results});
+                }
+            });
+        }
+    });
+  });
+
 
 app.all("*", (req,res,next) => {
   res.sendFile(path.resolve("./authorsApp/dist/index.html"))

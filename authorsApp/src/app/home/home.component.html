@@ -1,12 +1,16 @@
 <div style="text-align:center">
-
-
-    <div id="authors">
-      <div *ngFor="let author of authors.authors" class="authors">
-              Name: {{author.name}}
+  <div id="authors">
+    <table style="width:100%">
+      <tr>
+        <th>Author Name</th>
+        <th>Actions</th>
+      </tr>
+      <tr *ngFor="let author of authors.authors">
+        <td><a [routerLink]="['/show-quotes', author._id]">{{ author.name }}</a></td>
         <button (click)="getAuthor(author._id)" [routerLink]="['/edit']">Edit</button> <button (click)="delete(author._id)">Delete</button>
-
-      </div>
+      </tr>
+    </table>
+  </div>
 </div>
 
 <router-outlet></router-outlet>
